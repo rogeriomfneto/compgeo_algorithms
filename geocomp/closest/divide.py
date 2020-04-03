@@ -7,6 +7,7 @@ from geocomp.common import prim
 from geocomp.common import guiprim
 import math
 
+#   COMPATING FUNCTIONS
 def compareX(p1, p2):
     if (p1.x == p2.x): return p1.y - p2.y
     return p1.x - p2.x
@@ -15,6 +16,8 @@ def compareY(p1, p2):
     if (p1.y == p2.y): return p1.x - p2.x
     return p1.y - p2.y
 
+
+# SORTING FUNCTIONS
 def swap(v, i , j):
     v[i], v[j] = v[j], v[i]
 
@@ -40,6 +43,38 @@ def sort(v, compare):
     n = len(v)
     sort_rec(v, 0, n, compare)
 
+#   PLOTING FUNCTIONS
+def plot_vertical_lines(pm, dmin):
+    vl1 = control.plot_vert_line(pm.x, "orange", 2)
+    vl2 = control.plot_vert_line(pm.x - dmin, "orange", 2)
+    vl3 = control.plot_vert_line(pm.x + dmin, "orange", 2)
+    return vl1, vl2, vl3
+
+def delete_vertical_lines(vl1, vl2, vl3):
+    control.plot_delete(vl1)
+    control.plot_delete(vl2)
+    control.plot_delete(vl3)
+
+def plot_horizontal_lines(p, dmin):
+    hl1 = control.plot_horiz_line(p.y, "blue", 2)
+    hl2 = control.plot_horiz_line(p.y + dmin, "blue", 2)
+    return hl1, hl2
+
+def delete_horizontal_lines(hl1, hl2):
+    control.plot_delete(hl1)
+    control.plot_delete(hl2)
+
+def hilight_candidates(f):
+    hi = []
+    for p in f:
+        hi.append(p.hilight("cyan"))
+    return hi
+
+def unhilight_candidates(f, hi):
+    for i in  range(len(f)):
+        f[i].unhilight(hi[i])
+
+#   CLOSEST PAIR FUNCTIONS
 def merge(v, l, q, r, compare):
     v1, v2 = [], []
     for i in range(l, q):
@@ -69,44 +104,7 @@ def merge(v, l, q, r, compare):
         j += 1
         k += 1
 
-def candidates(p, l, r, dmin, pm):
-    f = []
-    for i in range(l, r):
-        if (abs(p[i].x - pm.x) < dmin):
-            print("candidate: ", p[i].x, p[i].y)
-            f.append(p[i])
-    return f
-
-def combine(p, l, r, p1, p2, pm):
-    dmin2 = guiprim.dist2(p1, p2)
-    dmin = math.sqrt(dmin2)
-    print("distancia mínima: ", dmin)
-    print("pontos: (", p1.x, p1.y, ") (", p2.x, p2.y, ")")
-    f = candidates(p, l, r, dmin, pm)
-    t = len(f)
-    vl1 = control.plot_vert_line(pm.x)
-    vl2 = control.plot_vert_line(pm.x - dmin)
-    vl3 = control.plot_vert_line(pm.x + dmin)
-    for i in range(t):
-        hl1 = control.plot_horiz_line(f[i].y)
-        hl2 = control.plot_horiz_line(f[i].y + dmin)
-        j = i + 1
-        while j < t and (f[j].y - f[i].y) < dmin:
-            d = guiprim.dist2(f[i], f[j])
-            if (d < dmin2):
-                p1, p2, dmin2 = f[i], f[j], d
-                update_points(p1, p2)
-            j += 1
-        control.plot_delete(hl1)
-        control.plot_delete(hl2)
-    control.plot_delete(vl1)
-    control.plot_delete(vl2)
-    control.plot_delete(vl3)
-    return p1, p2
-
-a, b, id = None, None, None
-hia, hib = None, None
-
+    
 def update_points(p1, p2):
     global a, b, id, hia, hib
     if (a != None and b != None):
@@ -123,8 +121,36 @@ def update_points(p1, p2):
     control.thaw_update() 
     control.update()
 
+def candidates(p, l, r, dmin, pm):
+    f = []
+    for i in range(l, r):
+        if (abs(p[i].x - pm.x) < dmin):
+            f.append(p[i])
+    return f
+
+def combine(p, l, r, p1, p2, pm):
+    dmin2 = guiprim.dist2(p1, p2)
+    dmin = math.sqrt(dmin2)
+    f = candidates(p, l, r, dmin, pm)
+    t = len(f)
+    vl1, vl2, vl3 = plot_vertical_lines(pm, dmin)
+    hi = hilight_candidates(f)
+    for i in range(t):
+        hl1, hl2 = plot_horizontal_lines(f[i], dmin)
+        j = i + 1
+        while j < t and (f[j].y - f[i].y) < dmin:
+            d = guiprim.dist2(f[i], f[j])
+            if (d < dmin2):
+                p1, p2, dmin2 = f[i], f[j], d
+                update_points(p1, p2)
+            j += 1
+        delete_horizontal_lines(hl1, hl2)
+    delete_vertical_lines(vl1, vl2, vl3)
+    unhilight_candidates(f, hi)
+    return p1, p2
+
+
 def divide_rec(p, l, r, compare):
-    print(l, r)
     #base
     if r - l == 2:
         sort_rec(p, l, r, compare)
@@ -146,10 +172,8 @@ def divide_rec(p, l, r, compare):
             update_points(p[l+1], p[l+2])
             return p[l+1], p[l+2]
     # 4 points or more
-    
     q = (l+r)//2
     pm = p[q] #median point
-    print("median point: ", pm.x, pm.y)
     p1, p2 = divide_rec(p, l, q, compare)
     de = prim.dist2(p1, p2)
     p3, p4 = divide_rec(p, q, r, compare)
@@ -164,9 +188,8 @@ def Divide (p):
     a, b, id, hia, hib = None, None, None, None, None
     sort(p, compareX)
     n = len(p)
+    if n == 1: return
     p1, p2 = divide_rec(p, 0, n, compareY)
     p1.hilight()
     p2.hilight()
-    print(p1, p2)
-    print(math.sqrt(prim.dist2(p1, p2)))
     return p1, p2
