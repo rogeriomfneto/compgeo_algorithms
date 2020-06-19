@@ -39,5 +39,6 @@ def Brute (l):
 	b.hilight('green')
 	ret = Segment (a, b)
 	ret.extra_info = 'distancia: %.2f'%math.sqrt (dist2 (a, b))
+	print(math.sqrt (dist2 (a, b)))
 	return ret
 

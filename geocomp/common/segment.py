@@ -2,14 +2,15 @@
 
 from . import control
 from geocomp import config
-from .prim import area2, left
+from .prim import area2, left, left_on
 
 
 class Segment:
     "Um segmento de reta"
-    def __init__ (self, pto_from=None, pto_to=None):
+
+    def __init__(self, pto_from=None, pto_to=None):
         "Para criar, passe os dois pontos extremos"
-        self.init  = pto_from
+        self.init = pto_from
         self.to = pto_to
         if self.__cmp(self.init, self.to) < 0:
             self.upper = self.init
@@ -18,7 +19,7 @@ class Segment:
             self.upper = self.to
             self.lower = self.init
 
-    def __repr__ (self):
+    def __repr__(self):
         "retorna uma string da forma [ ( x0 y0 );( x1 y1 ) ]"
         return '[ ' + repr(self.init) + '; ' + repr(self.to) + ' ]'
 
@@ -36,31 +37,35 @@ class Segment:
     def endpoints(self):
         return self.init, self.to
 
-    def hilight (self, color_line=config.COLOR_HI_SEGMENT,
-            color_point=config.COLOR_HI_SEGMENT_POINT):
+    def hilight(self, color_line=config.COLOR_HI_SEGMENT,
+                color_point=config.COLOR_HI_SEGMENT_POINT):
         "desenha o segmento de reta com destaque na tela"
-        self.lid = self.init.lineto (self.to, color_line)
-        self.pid0 = self.init.hilight (color_point)
-        self.pid1 = self.to.hilight (color_point)
+        self.lid = self.init.lineto(self.to, color_line)
+        self.pid0 = self.init.hilight(color_point)
+        self.pid1 = self.to.hilight(color_point)
         return self.lid
 
-    def unhilight (self):
-        control.plot_delete (self.lid)
-        control.plot_delete (self.pid0)
-        control.plot_delete (self.pid1)
+    def unhilight(self):
+        control.plot_delete(self.lid)
+        control.plot_delete(self.pid0)
+        control.plot_delete(self.pid1)
 
-    def plot (self, cor=config.COLOR_SEGMENT):
+    def plot(self, cor=config.COLOR_SEGMENT):
         "desenha o segmento de reta na tela"
-        self.lid = self.init.lineto (self.to, cor)
+        self.lid = self.init.lineto(self.to, cor)
         return self.lid
 
-    def hide (self, id=None):
+    def hide(self, id=None):
         "apaga o segmento de reta da tela"
-        if id is None: id = self.lid
-        control.plot_delete (id)
+        if id is None:
+            id = self.lid
+        control.plot_delete(id)
 
     def has_left(self, point):
         return left(self.init, self.to, point)
+
+    def has_left_on(self, point):
+        return left_on(self.init, self.to, point)
 
     def colinear_with(self, point):
         ''' returns if point is colinear with the segment. '''
@@ -72,10 +77,10 @@ class Segment:
             return False
         if self.init.x != self.to.x:
             return self.init.x <= point.x <= self.to.x \
-                   or self.to.x <= point.x <= self.init.x
+                or self.to.x <= point.x <= self.init.x
         else:
             return self.init.y <= point.y <= self.to.y \
-                   or self.to.y <= point.y <= self.init.y
+                or self.to.y <= point.y <= self.init.y
 
     def intersects_inside(self, other_segment) -> bool:
         ''' returns whether the other segment intersects this segment
@@ -88,18 +93,17 @@ class Segment:
 
         return (left(self.init, self.to, other_segment.init)
                 ^ left(self.init, self.to, other_segment.to))            \
-               and (left(other_segment.init, other_segment.to, self.init)
-                   ^ left(other_segment.init, other_segment.to, self.to))
-
+            and (left(other_segment.init, other_segment.to, self.init)
+                 ^ left(other_segment.init, other_segment.to, self.to))
 
     def intersects(self, other_segment) -> bool:
         if self.intersects_inside(other_segment):
             return True
 
         return self.has_inside(other_segment.init)    \
-               or self.has_inside(other_segment.to)   \
-               or other_segment.has_inside(self.init) \
-               or other_segment.has_inside(self.to)
+            or self.has_inside(other_segment.to)   \
+            or other_segment.has_inside(self.init) \
+            or other_segment.has_inside(self.to)
 
     def adj(self, p):
         if p == self.init:
@@ -129,7 +133,6 @@ class Segment:
     # Lucas Moretto.
     def __contains__(self, p):
         return p == self.init or p == self.to
-
 
     # A baixo seguem setters e getters para atributos para manter
     # compatibilidade com o projeto de Visibility Graph do Lucas

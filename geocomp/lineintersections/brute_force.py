@@ -4,6 +4,8 @@ from geocomp.common import control
 from geocomp import config
 
 def Brute_force (l):
+    print(type(l[0]))
+    print(type(l[0].init))
     filter_segments(l)
     intersections = []
 
