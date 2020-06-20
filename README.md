@@ -1,3 +1,19 @@
+# Computational Geometry
+
+This repo contains the framework and algorithms implemented for the MAC0331
+course at IME-USP. There are four different projects here:
+
+1. **The closest pair problem**: as the name suggests this problem consists of finding the closest pair of point in a set of points. For the assignment, it was used two dimentional points. The aproach used was divide-and-conquer, resulting in an algorithm of complexity O(nlgn).
+   
+2. **Line Intersections**: this is the problem of finding all lineintersections in a set of segments. The algorithm uses a line-sweep technic, wich consumes time proportional to O((n+i)lgn) where i is the number of the intersections. I couldn't make the code work very well but the animations look really good.
+  
+3. **Gift Wrapping for Convex Hull**: it's a very simple aproach and easy to code algorithm to find the convex hull of a set of points. The algorithm consumes time proportional to O(hn) where h is the number of vértices in the convex hull border.
+  
+4. **Graham algorithm for Convex Hull**: another aproach to find the convex hull of a set of points. Just like de gift wrapping, this algorithm is really easy to code but this one can run much faster depending on the set of points. This one consumes time proportional to O(nlgn).
+
+All the algorithms described above comes with a nice animation and where designed to work with any set of two-dimentional points (or at least I tried to). I recomend to run the the project using the Tk module from python. Writing something like `python tkgeocomp` should work just fine. A brief tutorial about the framework used is written bellow (in Portuguese):
+
+
 
 Existem três "front-ends" ({cli,tk,g}geocomp.py). Para rodar qualquer
 um deles, você vai precisar de Python (testado com aa versão 3.5.4,
